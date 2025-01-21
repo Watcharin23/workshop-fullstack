@@ -11,3 +11,10 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+
+/* ตัวอย่าง custom CSS */
+.custom-layout {
+  margin: 0 !important;
+  padding: 0 !important;
+}

@@ -1,5 +1,41 @@
+import axios from "axios";
+import Swal from "sweetalert2";
+import config from "../../config";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+
 function SingIn() {
-  return (
+  const [user, setUser] = useState({});
+  const navigate = useNavigate();
+
+  const handdleSignIn = async () => { 
+       // ต้องป้องกันการ reload ของหน้าด้วย
+    try {
+        // สร้าง URL ให้ถูกต้อง
+        const res = await axios.post(`${config.apiPath}/user/signIn`, user);
+
+        if (res.data.token !== undefined) {
+          localStorage.setItem("token", res.data.token); // ควรตั้งชื่อยากๆตรง token
+          navigate('/home');
+        }
+    } catch (e) {
+      // ตรวจสอบว่า e.response มีค่าแล้วค่อยเข้าถึง status
+      if (e.response.status === 401) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Invalid user or password!',
+        });
+      } else {
+        Swal.fire({
+          title: 'Error',
+          text: e.message || 'Something went wrong!',
+          icon: 'error',
+        });
+      }
+    }
+  };
+  return  (
     <div className='hold-transition login-page'>
 <div className="login-box">
   <div className="login-logo">
@@ -9,9 +45,10 @@ function SingIn() {
     <div className="card-body login-card-body">
       <p className="login-box-msg">Sign in to start your session</p>
 
-      <form action="../../index3.html" method="post">
+ <div>
         <div className="input-group mb-3">
-          <input type="email" className="form-control" placeholder="Email" />
+          <input className="form-control" placeholder="username"
+          onChange={e => setUser({...user, user: e.target.value})} />
           <div className="input-group-append">
             <div className="input-group-text">
               <span className="fas fa-envelope"></span>
@@ -19,7 +56,8 @@ function SingIn() {
           </div>
         </div>
         <div className="input-group mb-3">
-          <input type="password" className="form-control" placeholder="Password" />
+          <input type="password" className="form-control" placeholder="Password"
+          onChange={e => setUser({...user, pass: e.target.value})} />
           <div className="input-group-append">
             <div className="input-group-text">
               <span className="fas fa-lock"></span>
@@ -37,10 +75,11 @@ function SingIn() {
           </div>
 
           <div className="col-4">
-            <button type="submit" className="btn btn-primary btn-block">Sign In</button>
+            <button type="submit" className="btn btn-primary btn-block"
+            onClick={handdleSignIn}>Sign In</button>
           </div>
         </div>
-      </form>
+      </div>
       <div className="social-auth-links text-center mb-3">
         <p>- OR -</p>
         <a href="#" className="btn btn-block btn-primary">
